@@ -1,5 +1,8 @@
 using EventManagementSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using EventManagementSystem.Core.Interfaces;
+using EventManagementSystem.Infrastructure.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 
