@@ -3,6 +3,7 @@ using EventManagementSystem.Core.Entities;
 using EventManagementSystem.Core.Interfaces;
 using EventManagementSystem.Core.DTOs;
 
+
 namespace EventManagementSystem.API.Controllers
 {
     [ApiController]

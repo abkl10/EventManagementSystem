@@ -39,6 +39,17 @@ namespace EventManagementSystem.Infrastructure.Repositories
         {
             _dbSet.Remove(entity);
         }
+        public async Task UpdateAsync(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteAsync(T entity)
+        {
+            _context.Set<T>().Remove(entity);
+            await Task.CompletedTask;
+        }
 
         public async Task SaveChangesAsync()
         {
