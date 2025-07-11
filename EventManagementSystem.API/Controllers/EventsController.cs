@@ -38,5 +38,38 @@ namespace EventManagementSystem.API.Controllers
             await _eventRepository.SaveChangesAsync();
             return CreatedAtAction(nameof(GetById), new { id = evt.Id }, evt);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Event updatedEvent)
+        {
+            var existingEvent = await _eventRepository.GetByIdAsync(id);
+            if (existingEvent == null)
+                return NotFound();
+
+            // Mise à jour des propriétés
+            existingEvent.Title = updatedEvent.Title;
+            existingEvent.Description = updatedEvent.Description;
+            existingEvent.Date = updatedEvent.Date;
+            existingEvent.Price = updatedEvent.Price;
+            existingEvent.Capacity = updatedEvent.Capacity;
+
+            await _eventRepository.UpdateAsync(existingEvent);
+            await _eventRepository.SaveChangesAsync();
+
+            return NoContent(); 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var existingEvent = await _eventRepository.GetByIdAsync(id);
+            if (existingEvent == null)
+                return NotFound();
+
+            await _eventRepository.DeleteAsync(existingEvent);
+            await _eventRepository.SaveChangesAsync();
+
+            return NoContent(); 
+        }
     }
 }
