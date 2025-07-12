@@ -5,3 +5,7 @@ obj/
 .vs/
 .env
 appsettings.json
+event-management-client/build/
+
+
+
