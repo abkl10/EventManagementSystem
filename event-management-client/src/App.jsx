@@ -8,6 +8,9 @@ import RegisterPage from './pages/RegisterPage';
 import Navbar from './components/Navbar';
 import DashboardPage from './pages/DashboardPage';
 import PrivateRoute from './components/PrivateRoute';
+import EventFormPage from './pages/EventFormPage';
+
+
 
 function App() {
   return (
@@ -20,6 +23,8 @@ function App() {
         <Route path="/reservations" element={<ReservationsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/events/new" element={<EventFormPage />} />
+        <Route path="/events/edit/:id" element={<EventFormPage />} />
         <Route path="/dashboard" element={
     <PrivateRoute>
       <DashboardPage />

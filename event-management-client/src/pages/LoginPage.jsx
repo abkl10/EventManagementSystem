@@ -1,10 +1,13 @@
-import { useState, navigate } from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [token, setToken] = useState('');
   const [error, setError] = useState('');
+
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,11 +17,16 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5161/api/auth/login', form);
-      setToken(res.data.token);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem("userEmail", res.data.email);
-      setError('');
-      navigate('/dashboard');
+
+      if (res.data.token) {
+        setToken(res.data.token);
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('userEmail', res.data.email);
+        setError('');
+        navigate('/dashboard'); 
+      } else {
+        setError('Invalid login response');
+      }
 
     } catch (err) {
       setError('Login failed');
