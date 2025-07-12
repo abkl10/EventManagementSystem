@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using EventManagementSystem.Core.Entities;
 using EventManagementSystem.Core.Interfaces;
 using EventManagementSystem.Core.DTOs;
+using Microsoft.AspNetCore.Authorization;
+
 
 
 namespace EventManagementSystem.API.Controllers
@@ -26,6 +28,7 @@ namespace EventManagementSystem.API.Controllers
         }
 
         // POST: api/reservation
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReservationCreateDto dto)
         {

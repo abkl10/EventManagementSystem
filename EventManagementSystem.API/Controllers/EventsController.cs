@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using EventManagementSystem.Core.Entities;
 using EventManagementSystem.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace EventManagementSystem.API.Controllers
 {
@@ -30,6 +32,7 @@ namespace EventManagementSystem.API.Controllers
             return Ok(evt);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Event evt)
         {
