@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const ReservationPage = () => {
   const [reservations, setReservations] = useState([]);
   const token = localStorage.getItem('token');
+  const navigate = useNavigate();
 
   const fetchReservations = async () => {
     try {
@@ -34,6 +37,9 @@ const ReservationPage = () => {
   return (
     <div style={{ padding: '1rem' }}>
       <h2>My Reservations</h2>
+      <button onClick={() => navigate('/reservations/new')} style={{ marginBottom: '1rem' }}>
+        ➕ New Reservation
+      </button>
       {reservations.length === 0 ? (
         <p>No reservations yet.</p>
       ) : (
@@ -41,13 +47,17 @@ const ReservationPage = () => {
           {reservations.map(res => (
             <li key={res.id}>
               📅 {new Date(res.reservationDate).toLocaleString()} – 🎫 Event ID: {res.eventId} – Qty: {res.quantity}
-              <button onClick={() => handleDelete(res.id)} style={{ marginLeft: '1rem', color: 'red' }}>
+              <button onClick={() => navigate(`/reservations/${res.id}/edit`)} style={{ marginLeft: '1rem' }}>
+                ✏️ Edit
+              </button>
+              <button onClick={() => handleDelete(res.id)} style={{ marginLeft: '0.5rem', color: 'red' }}>
                 ❌ Delete
               </button>
             </li>
           ))}
         </ul>
       )}
+
     </div>
   );
 };
