@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, navigate } from 'react';
 import axios from 'axios';
 
 const RegisterPage = () => {
@@ -13,7 +13,9 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5161/api/auth/register', form);
+      navigate('/login');
       setMessage(res.data);
+      
     } catch (err) {
       setMessage('Registration failed.');
     }

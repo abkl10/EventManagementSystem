@@ -1,14 +1,40 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, [localStorage.getItem('token')]); 
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userEmail');
+    setIsAuthenticated(false);
+    navigate('/login');
+  };
+
   return (
     <nav style={styles.nav}>
       <h2 style={styles.logo}>🎟️ Event Manager</h2>
       <ul style={styles.links}>
         <li><Link to="/events" style={styles.link}>Events</Link></li>
         <li><Link to="/reservations" style={styles.link}>Reservations</Link></li>
-        <li><Link to="/login" style={styles.link}>Login</Link></li>
-        <li><Link to="/register" style={styles.link}>Register</Link></li>
+
+        {isAuthenticated ? (
+          <>
+            <li><Link to="/dashboard" style={styles.link}>Dashboard</Link></li>
+            <li><button onClick={handleLogout} style={{ ...styles.link, background: 'none', border: 'none', cursor: 'pointer' }}>Logout</button></li>
+          </>
+        ) : (
+          <>
+            <li><Link to="/login" style={styles.link}>Login</Link></li>
+            <li><Link to="/register" style={styles.link}>Register</Link></li>
+          </>
+        )}
       </ul>
     </nav>
   );

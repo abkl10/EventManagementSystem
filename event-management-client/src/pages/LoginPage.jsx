@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, navigate } from 'react';
 import axios from 'axios';
 
 const LoginPage = () => {
@@ -18,6 +18,8 @@ const LoginPage = () => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem("userEmail", res.data.email);
       setError('');
+      navigate('/dashboard');
+
     } catch (err) {
       setError('Login failed');
     }
