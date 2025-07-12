@@ -17,6 +17,7 @@ namespace EventManagementSystem.API.Controllers
             _eventRepository = eventRepository;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +25,7 @@ namespace EventManagementSystem.API.Controllers
             return Ok(events);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -42,6 +44,7 @@ namespace EventManagementSystem.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = evt.Id }, evt);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Event updatedEvent)
         {
@@ -62,6 +65,7 @@ namespace EventManagementSystem.API.Controllers
             return NoContent(); 
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

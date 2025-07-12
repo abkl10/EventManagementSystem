@@ -3,8 +3,7 @@ using EventManagementSystem.Core.Entities;
 using EventManagementSystem.Core.Interfaces;
 using EventManagementSystem.Core.DTOs;
 using Microsoft.AspNetCore.Authorization;
-
-
+using System.Security.Claims;
 
 namespace EventManagementSystem.API.Controllers
 {
@@ -20,6 +19,7 @@ namespace EventManagementSystem.API.Controllers
         }
 
         // GET: api/reservation
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -27,14 +27,27 @@ namespace EventManagementSystem.API.Controllers
             return Ok(reservations);
         }
 
+        // GET: api/reservation/{id}
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(id);
+            if (reservation == null) return NotFound();
+            return Ok(reservation);
+        }
+
         // POST: api/reservation
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReservationCreateDto dto)
         {
+            // Get authenticated user's ID from JWT
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var reservation = new Reservation
             {
-                UserId = dto.UserId,
+                UserId = userId,
                 EventId = dto.EventId,
                 Quantity = dto.Quantity,
                 ReservationDate = DateTime.UtcNow
@@ -43,10 +56,11 @@ namespace EventManagementSystem.API.Controllers
             await _reservationRepository.AddAsync(reservation);
             await _reservationRepository.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetAll), new { id = reservation.Id }, reservation);
+            return CreatedAtAction(nameof(GetById), new { id = reservation.Id }, reservation);
         }
 
-        // DELETE: api/reservation/5
+        // DELETE: api/reservation/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
