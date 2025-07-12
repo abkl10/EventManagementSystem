@@ -24,6 +24,7 @@ namespace EventManagementSystem.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var reservations = await _reservationRepository.GetAllWithEventAsync();
 
             var result = reservations.Select(r => new
@@ -42,6 +43,33 @@ namespace EventManagementSystem.API.Controllers
 
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyReservations()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var reservations = await _reservationRepository.GetAllWithEventAsync();
+
+            var myReservations = reservations
+                .Where(r => r.UserId == userId)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.ReservationDate,
+                    r.Quantity,
+                    Event = new
+                    {
+                        r.Event.Id,
+                        r.Event.Title,
+                        r.Event.Date,
+                        r.Event.Price
+                    }
+                });
+
+            return Ok(myReservations);
+        }
+
 
         // GET: api/reservation/{id}
         [Authorize]
