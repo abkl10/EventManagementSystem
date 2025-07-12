@@ -46,7 +46,7 @@ const ReservationPage = () => {
         <ul>
           {reservations.map(res => (
             <li key={res.id}>
-              📅 {new Date(res.reservationDate).toLocaleString()} – 🎫 Event ID: {res.eventId} – Qty: {res.quantity}
+             📅 {new Date(res.event.date).toLocaleDateString()} - 🎫 {res.event.title} ({res.quantity} places)
               <button onClick={() => navigate(`/reservations/${res.id}/edit`)} style={{ marginLeft: '1rem' }}>
                 ✏️ Edit
               </button>
