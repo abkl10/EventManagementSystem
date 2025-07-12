@@ -10,7 +10,7 @@ const ReservationPage = () => {
 
   const fetchReservations = async () => {
     try {
-      const res = await axios.get('http://localhost:5161/api/reservation', {
+      const res = await axios.get('http://localhost:5161/api/reservation/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setReservations(res.data);
