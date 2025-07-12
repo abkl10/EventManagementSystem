@@ -58,6 +58,27 @@ namespace EventManagementSystem.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = reservation.Id }, reservation);
         }
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] ReservationCreateDto dto)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(id);
+            if (reservation == null) return NotFound();
+
+            // Vérifie que l'utilisateur connecté est le propriétaire de la réservation
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (reservation.UserId != userId)
+                return Forbid();
+
+            reservation.EventId = dto.EventId;
+            reservation.Quantity = dto.Quantity;
+            reservation.ReservationDate = DateTime.UtcNow;
+
+            await _reservationRepository.UpdateAsync(reservation);
+            await _reservationRepository.SaveChangesAsync();
+
+            return NoContent();
+        }
 
         // DELETE: api/reservation/{id}
         [Authorize]
