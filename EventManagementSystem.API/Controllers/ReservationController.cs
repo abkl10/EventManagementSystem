@@ -11,20 +11,36 @@ namespace EventManagementSystem.API.Controllers
     [Route("api/[controller]")]
     public class ReservationController : ControllerBase
     {
-        private readonly IRepository<Reservation> _reservationRepository;
+        private readonly IReservationRepository _reservationRepository;
 
-        public ReservationController(IRepository<Reservation> reservationRepository)
+        public ReservationController(IReservationRepository reservationRepository)
         {
             _reservationRepository = reservationRepository;
         }
+
 
         // GET: api/reservation
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var reservations = await _reservationRepository.GetAllAsync();
-            return Ok(reservations);
+            var reservations = await _reservationRepository.GetAllWithEventAsync();
+
+            var result = reservations.Select(r => new
+            {
+                r.Id,
+                r.ReservationDate,
+                r.Quantity,
+                Event = new
+                {
+                    r.Event.Id,
+                    r.Event.Title,
+                    r.Event.Date,
+                    r.Event.Price
+                }
+            });
+
+            return Ok(result);
         }
 
         // GET: api/reservation/{id}
@@ -58,6 +74,7 @@ namespace EventManagementSystem.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = reservation.Id }, reservation);
         }
+
         [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ReservationCreateDto dto)
