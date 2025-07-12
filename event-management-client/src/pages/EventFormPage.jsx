@@ -16,12 +16,28 @@ const EventFormPage = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      axios.get(`http://localhost:5161/api/events/${id}`)
-        .then(res => setForm(res.data))
-        .catch(err => console.error(err));
-    }
-  }, [id]);
+  if (id) {
+    const fetchEvent = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5161/api/events/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setForm(res.data);
+      } catch (err) {
+        console.error(err);
+        if (err.response && err.response.status === 401) {
+          alert("Unauthorized. Please login again.");
+          navigate('/login');
+        }
+      }
+    };
+
+    fetchEvent();
+  }
+}, [id, token, navigate]);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
