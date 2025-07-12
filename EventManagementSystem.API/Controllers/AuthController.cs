@@ -76,7 +76,7 @@ namespace EventManagementSystem.API.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Ok(new { token = tokenString });
+            return Ok(new { token = tokenString, email = user.Email });
         }
 
     }

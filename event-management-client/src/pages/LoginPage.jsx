@@ -16,6 +16,7 @@ const LoginPage = () => {
       const res = await axios.post('http://localhost:5161/api/auth/login', form);
       setToken(res.data.token);
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem("userEmail", res.data.email);
       setError('');
     } catch (err) {
       setError('Login failed');
