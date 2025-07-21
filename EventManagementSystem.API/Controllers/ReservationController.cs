@@ -11,11 +11,15 @@ namespace EventManagementSystem.API.Controllers
     [Route("api/[controller]")]
     public class ReservationController : ControllerBase
     {
-        private readonly IReservationRepository _reservationRepository;
+        private readonly IReservationRepository _reservationRepository;        
+        private readonly IRepository<Event> _eventRepository;
 
-        public ReservationController(IReservationRepository reservationRepository)
+
+        public ReservationController(IReservationRepository reservationRepository, IRepository<Event> eventRepository)
         {
             _reservationRepository = reservationRepository;
+                _eventRepository = eventRepository;
+
         }
 
 
@@ -81,14 +85,32 @@ namespace EventManagementSystem.API.Controllers
             return Ok(reservation);
         }
 
-        // POST: api/reservation
+        // POST: api/reservation 
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReservationCreateDto dto)
         {
-            // Get authenticated user's ID from JWT
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            // Récupère l'événement associé
+            var evt = await _eventRepository.GetByIdAsync(dto.EventId);
+            if (evt == null) return NotFound("Event not found");
+
+            // Récupère les réservations existantes pour cet événement
+            var reservations = await _reservationRepository.GetAllAsync();
+            var totalReserved = reservations
+                .Where(r => r.EventId == dto.EventId)
+                .Sum(r => r.Quantity);
+
+            var availableSeats = evt.Capacity - totalReserved;
+
+            // Vérifie la capacité restante
+            if (dto.Quantity > availableSeats)
+            {
+                return BadRequest($"Only {availableSeats} seat(s) remaining for this event.");
+            }
+
+            // Crée la réservation
             var reservation = new Reservation
             {
                 UserId = userId,
@@ -102,6 +124,7 @@ namespace EventManagementSystem.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = reservation.Id }, reservation);
         }
+
 
         [Authorize]
         [HttpPut("{id}")]

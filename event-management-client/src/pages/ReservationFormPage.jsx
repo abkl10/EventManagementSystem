@@ -6,6 +6,8 @@ const ReservationFormPage = () => {
   const { id } = useParams(); // pour l’édition si id existe
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const [error, setError] = useState('');
+
 
   const [form, setForm] = useState({
     eventId: '',
@@ -34,31 +36,45 @@ const ReservationFormPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const config = { headers: { Authorization: `Bearer ${token}` } };
+  e.preventDefault();
+  const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    try {
-      if (id) {
-        await axios.put(`http://localhost:5161/api/reservation/${id}`, form, config);
-      } else {
-        await axios.post(`http://localhost:5161/api/reservation`, form, config);
-      }
-      navigate('/reservations');
-    } catch (err) {
-      console.error(err);
+  try {
+    if (id) {
+      await axios.put(`http://localhost:5161/api/reservation/${id}`, form, config);
+    } else {
+      await axios.post(`http://localhost:5161/api/reservation`, form, config);
     }
-  };
+    setError('');
+    navigate('/reservations');
+  } catch (err) {
+    if (err.response && err.response.status === 400) {
+      setError(err.response.data); 
+    } else {
+      setError('An error occurred. Please try again.');
+    }
+  }
+};
+
 
   return (
     <div style={{ padding: '1rem' }}>
       <h2>{id ? 'Edit Reservation' : 'Create Reservation'}</h2>
+      {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <label>
+        Event:
+        </label>
         <select name="eventId" value={form.eventId} onChange={handleChange} required>
           <option value="">Select an event</option>
           {events.map(evt => (
             <option key={evt.id} value={evt.id}>{evt.title}</option>
           ))}
         </select>
+        
+        <label>
+        Quantity:
+        </label>
         <input type="number" name="quantity" placeholder="Quantity" value={form.quantity} onChange={handleChange} required />
         <button type="submit">{id ? 'Update' : 'Create'}</button>
       </form>
