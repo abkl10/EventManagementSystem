@@ -38,15 +38,23 @@ namespace EventManagementSystem.API.Controllers
                 FullName = dto.FullName
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Password);
 
-            if (!result.Succeeded)
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "User");
+            }
+            else
+            {
                 return BadRequest(result.Errors);
+            }
+
+            
 
             return Ok("Registration successful");
         }
 
-        
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -77,6 +85,19 @@ namespace EventManagementSystem.API.Controllers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return Ok(new { token = tokenString, email = user.Email });
+        }
+        
+        [HttpPost("assign-role")]
+        public async Task<IActionResult> AssignRole(string email, string role)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return NotFound();
+
+            var result = await _userManager.AddToRoleAsync(user, role);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok($"Rôle {role} assigné à {email}");
         }
 
     }
