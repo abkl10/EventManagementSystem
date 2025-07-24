@@ -6,6 +6,8 @@ const EventListPage = () => {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
+
 
   const fetchEvents = async () => {
     try {
@@ -37,7 +39,7 @@ const EventListPage = () => {
     <div style={{ padding: '1rem' }}>
       <h2>🎫 All Events</h2>
 
-      {token && (
+      {token && role ==='Organizer' && (
         <button onClick={() => navigate('/events/new')} style={{ marginBottom: '1rem' }}>
           + Create New Event
         </button>
@@ -55,7 +57,7 @@ const EventListPage = () => {
               <p><strong>Price:</strong> ${event.price}</p>
               <p><strong>Capacity:</strong> {event.capacity}</p>
 
-              {token && (
+              {token && role ==='Organizer' && (
                 <div style={{ marginTop: '1rem' }}>
                   <button onClick={() => navigate(`/events/edit/${event.id}`)}>✏️ Edit</button>
                   <button onClick={() => handleDelete(event.id)} style={{ marginLeft: '0.5rem', color: 'red' }}>
