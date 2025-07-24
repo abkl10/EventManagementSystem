@@ -25,7 +25,7 @@ namespace EventManagementSystem.API.Controllers
             return Ok(events);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,7 +34,7 @@ namespace EventManagementSystem.API.Controllers
             return Ok(evt);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Event evt)
         {
@@ -44,7 +44,7 @@ namespace EventManagementSystem.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = evt.Id }, evt);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Event updatedEvent)
         {
@@ -65,7 +65,7 @@ namespace EventManagementSystem.API.Controllers
             return NoContent(); 
         }
 
-        [Authorize]
+        [Authorize(Roles = "Organizer")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -22,6 +22,8 @@ const LoginPage = () => {
         setToken(res.data.token);
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userEmail', res.data.email);
+        localStorage.setItem('role', res.data.role);
+
         setError('');
         navigate('/dashboard'); 
       } else {

@@ -64,12 +64,17 @@ namespace EventManagementSystem.API.Controllers
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!result.Succeeded) return Unauthorized("Invalid credentials");
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("role", roles.FirstOrDefault() ?? "User") 
             };
+
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role))); 
 
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
@@ -84,7 +89,7 @@ namespace EventManagementSystem.API.Controllers
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Ok(new { token = tokenString, email = user.Email });
+            return Ok(new { token = tokenString, email = user.Email, role = roles.FirstOrDefault() ?? "User" });
         }
         
         [HttpPost("assign-role")]
