@@ -7,17 +7,24 @@ const ReservationPage = () => {
   const [reservations, setReservations] = useState([]);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const role = localStorage.getItem('role');
+
 
   const fetchReservations = async () => {
-    try {
-      const res = await axios.get('http://localhost:5161/api/reservation/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setReservations(res.data);
-    } catch (err) {
-      console.error('Error fetching reservations:', err);
-    }
-  };
+  try {
+    const endpoint = role === 'Admin'
+      ? 'http://localhost:5161/api/reservation/'
+      : 'http://localhost:5161/api/reservation/my';
+
+    const res = await axios.get(endpoint, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setReservations(res.data);
+  } catch (err) {
+    console.error('Error fetching reservations:', err);
+  }
+};
+
 
   useEffect(() => {
     fetchReservations();
@@ -28,7 +35,8 @@ const ReservationPage = () => {
       await axios.delete(`http://localhost:5161/api/reservation/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchReservations(); // refresh the list
+      fetchReservations(); 
+      
     } catch (err) {
       console.error('Error deleting reservation:', err);
     }
@@ -36,7 +44,8 @@ const ReservationPage = () => {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <h2>My Reservations</h2>
+      
+      <h2> {role === 'Admin' ? 'All Reservations' : 'My Reservations'}</h2>
       <button onClick={() => navigate('/reservations/new')} style={{ marginBottom: '1rem' }}>
         ➕ New Reservation
       </button>
@@ -45,16 +54,19 @@ const ReservationPage = () => {
       ) : (
         <ul>
           {reservations.map(res => (
-            <li key={res.id}>
-             📅 {new Date(res.event.date).toLocaleDateString()} - 🎫 {res.event.title} ({res.quantity} places)
-              <button onClick={() => navigate(`/reservations/${res.id}/edit`)} style={{ marginLeft: '1rem' }}>
-                ✏️ Edit
-              </button>
-              <button onClick={() => handleDelete(res.id)} style={{ marginLeft: '0.5rem', color: 'red' }}>
-                ❌ Delete
-              </button>
-            </li>
-          ))}
+          <li key={res.id}>
+            📅 {new Date(res.event.date).toLocaleDateString()} – 🎫 {res.event.title} ({res.quantity} place{res.quantity > 1 ? 's' : ''})
+            {role === 'Admin' && res.user && (
+              <> – 👤 {res.user.email}</>
+            )}
+            <button onClick={() => navigate(`/reservations/${res.id}/edit`)} style={{ marginLeft: '1rem' }}>
+              ✏️ Edit
+            </button>
+            <button onClick={() => handleDelete(res.id)} style={{ marginLeft: '0.5rem', color: 'red' }}>
+              ❌ Delete
+            </button>
+          </li>
+        ))}
         </ul>
       )}
 

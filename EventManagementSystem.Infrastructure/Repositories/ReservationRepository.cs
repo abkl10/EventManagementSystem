@@ -18,6 +18,7 @@ namespace EventManagementSystem.Infrastructure.Repositories
         {
             return await _context.Reservations
                 .Include(r => r.Event)
+                .Include(r => r.User)
                 .ToListAsync();
         }
     }

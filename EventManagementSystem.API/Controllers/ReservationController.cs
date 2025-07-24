@@ -24,7 +24,7 @@ namespace EventManagementSystem.API.Controllers
 
 
         // GET: api/reservation
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -36,6 +36,7 @@ namespace EventManagementSystem.API.Controllers
                 r.Id,
                 r.ReservationDate,
                 r.Quantity,
+                User = new { r.User.Email },
                 Event = new
                 {
                     r.Event.Id,
