@@ -11,31 +11,50 @@ import PrivateRoute from './components/PrivateRoute';
 import EventFormPage from './pages/EventFormPage';
 import ReservationFormPage from './pages/ReservationFormPage';
 
-
-
-
-
 function App() {
   return (
     <Router>
-      <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-       <Route path="/events" element={<EventListPage />} />
-        <Route path="/events/:id" element={<EventDetailsPage />} />
-        <Route path="/reservations" element={<ReservationsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/events/new" element={<EventFormPage />} />
-        <Route path="/events/edit/:id" element={<EventFormPage />} />
-        <Route path="/reservations/new" element={<PrivateRoute><ReservationFormPage /></PrivateRoute>} />
-        <Route path="/reservations/:id/edit" element={<PrivateRoute><ReservationFormPage /></PrivateRoute>} />
-        <Route path="/dashboard" element={
-    <PrivateRoute>
-      <DashboardPage />
-    </PrivateRoute>
-  }
-/>
+        
+        <Route path="*" element={
+          <>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/events" element={<EventListPage />} />
+              <Route path="/events/:id" element={<EventDetailsPage />} />
+              <Route path="/reservations" element={<ReservationsPage />} />
+              <Route path="/events/new" element={<EventFormPage />} />
+              <Route path="/events/edit/:id" element={<EventFormPage />} />
+              <Route 
+                path="/reservations/new" 
+                element={
+                  <PrivateRoute>
+                    <ReservationFormPage />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/reservations/:id/edit" 
+                element={
+                  <PrivateRoute>
+                    <ReservationFormPage />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <PrivateRoute>
+                    <DashboardPage />
+                  </PrivateRoute>
+                } 
+              />
+            </Routes>
+          </>
+        } />
       </Routes>
     </Router>
   );
