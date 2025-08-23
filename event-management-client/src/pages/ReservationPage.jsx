@@ -46,9 +46,11 @@ const ReservationPage = () => {
     <div style={{ padding: '1rem' }}>
       
       <h2> {role === 'Admin' ? 'All Reservations' : 'My Reservations'}</h2>
+      {token  && (
       <button onClick={() => navigate('/reservations/new')} style={{ marginBottom: '1rem' }}>
         ➕ New Reservation
       </button>
+      )}
       {reservations.length === 0 ? (
         <p>No reservations yet.</p>
       ) : (
