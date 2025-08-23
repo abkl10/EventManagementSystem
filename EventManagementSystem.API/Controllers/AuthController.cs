@@ -121,6 +121,13 @@ namespace EventManagementSystem.API.Controllers
                 return StatusCode(500, new { message = "Erreur serveur", error = ex.Message });
             }
         }
+        [HttpGet("available-roles")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetAvailableRoles()
+        {
+            var roles = new[] { "Admin", "Organizer", "User" };
+            return Ok(roles);
+        }
 
         [HttpGet("users")]
         [Authorize(Roles = "Admin")]
