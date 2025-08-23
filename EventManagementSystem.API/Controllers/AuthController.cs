@@ -95,16 +95,31 @@ namespace EventManagementSystem.API.Controllers
         }
 
         [HttpPost("assign-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole(string email, string role)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return NotFound();
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null) 
+                    return NotFound(new { message = "Utilisateur non trouvé" });
 
-            var result = await _userManager.AddToRoleAsync(user, role);
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeResult.Succeeded)
+                    return BadRequest(new { message = "Erreur lors de la suppression des rôles", errors = removeResult.Errors });
 
-            return Ok($"Rôle {role} assigné à {email}");
+                var addResult = await _userManager.AddToRoleAsync(user, role);
+                if (!addResult.Succeeded)
+                    return BadRequest(new { message = "Erreur lors de l'ajout du rôle", errors = addResult.Errors });
+
+                return Ok(new { message = $"Rôle de {email} changé en {role}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erreur serveur", error = ex.Message });
+            }
         }
 
         [HttpGet("users")]
