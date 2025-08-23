@@ -227,7 +227,7 @@ const DashboardPage = () => {
             style={styles.actionButton}
           >
             <span style={styles.actionIcon}>📋</span>
-            <span>Mes Réservations</span>
+            <span>{role === 'User' ? ' Mes' : ''} Réservations</span>
           </button>
           
           {(role === 'Organizer' || role === 'Admin') && (
