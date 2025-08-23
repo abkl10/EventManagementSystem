@@ -29,11 +29,47 @@ const DashboardPage = () => {
     setIsLoadingUsers(false);
   }
 };
+
   
   const [recentEvents, setRecentEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false); 
+  const [editingUser, setEditingUser] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
+
+  const fetchAvailableRoles = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.get('http://localhost:5161/api/auth/available-roles', config);
+      setAvailableRoles(res.data);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+    }
+  };
+
+  const changeUserRole = async (email, newRole) => {
+  try {
+    const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    
+    await axios.post('http://localhost:5161/api/auth/assign-role', 
+      null, 
+      { 
+        ...config,
+        params: { email, role: newRole }
+      }
+    );
+    
+    await fetchUsers();
+    setEditingUser(null);
+    alert('Rôle modifié avec succès');
+  } catch (err) {
+    console.error("Error changing role:", err);
+    alert('Erreur lors de la modification du rôle');
+  }
+};
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -44,6 +80,7 @@ const DashboardPage = () => {
         
         if (role === 'Admin') {
         await fetchUsers();
+        await fetchAvailableRoles();
       }
         const eventsRes = await axios.get('http://localhost:5161/api/events', config);
         const allEvents = eventsRes.data;
@@ -248,6 +285,7 @@ const DashboardPage = () => {
               <th style={styles.tableHeader}>Email</th>
               <th style={styles.tableHeader}>Rôle</th>
               <th style={styles.tableHeader}>Date d'inscription</th>
+              <th style={styles.tableHeader}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -255,13 +293,42 @@ const DashboardPage = () => {
               <tr key={user.id}>
                 <td style={styles.tableCell}>{user.email}</td>
                 <td style={styles.tableCell}>
-                  <span style={user.role === 'Admin' ? styles.adminBadge : 
-                              user.role === 'Organizer' ? styles.organizerBadge : styles.userBadge}>
-                    {user.role}
-                  </span>
+                  {editingUser === user.id ? (
+                    <select 
+                      defaultValue={user.role}
+                      onChange={(e) => changeUserRole(user.email, e.target.value)}
+                      style={styles.roleSelect}
+                    >
+                      {availableRoles.map(role => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span style={user.role === 'Admin' ? styles.adminBadge : 
+                                user.role === 'Organizer' ? styles.organizerBadge : styles.userBadge}>
+                      {user.role}
+                    </span>
+                  )}
                 </td>
                 <td style={styles.tableCell}>
                   {new Date(user.createdAt).toLocaleDateString('fr-FR')}
+                </td>
+                <td style={styles.tableCell}>
+                  {editingUser === user.id ? (
+                    <button 
+                      onClick={() => setEditingUser(null)}
+                      style={styles.cancelButton}
+                    >
+                      Annuler
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={() => setEditingUser(user.id)}
+                      style={styles.editButton}
+                    >
+                      ✏️ Modifier
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
