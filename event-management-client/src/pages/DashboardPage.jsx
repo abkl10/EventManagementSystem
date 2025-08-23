@@ -13,17 +13,38 @@ const DashboardPage = () => {
     upcomingEvents: 0,
     recentReservations: 0
   });
+
+  const fetchUsers = async () => {
+  if (role !== 'Admin') return;
+  
+  setIsLoadingUsers(true);
+  try {
+    const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const res = await axios.get('http://localhost:5161/api/auth/users', config);
+    setUsers(res.data);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+  } finally {
+    setIsLoadingUsers(false);
+  }
+};
   
   const [recentEvents, setRecentEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false); 
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
         
-        
+        if (role === 'Admin') {
+        await fetchUsers();
+      }
         const eventsRes = await axios.get('http://localhost:5161/api/events', config);
         const allEvents = eventsRes.data;
         setRecentEvents(allEvents.slice(0, 3)); 
@@ -83,6 +104,7 @@ const DashboardPage = () => {
         setIsLoading(false);
       }
     };
+    
 
     fetchDashboardData();
   }, [role, userEmail]);
@@ -213,11 +235,93 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
+{role === 'Admin' && (
+  <div style={styles.section}>
+    <h2 style={styles.sectionTitle}>Gestion des Utilisateurs</h2>
+    {isLoadingUsers ? (
+      <p>Chargement des utilisateurs...</p>
+    ) : users.length > 0 ? (
+      <div style={styles.tableContainer}>
+        <table style={styles.usersTable}>
+          <thead>
+            <tr>
+              <th style={styles.tableHeader}>Email</th>
+              <th style={styles.tableHeader}>Rôle</th>
+              <th style={styles.tableHeader}>Date d'inscription</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id}>
+                <td style={styles.tableCell}>{user.email}</td>
+                <td style={styles.tableCell}>
+                  <span style={user.role === 'Admin' ? styles.adminBadge : 
+                              user.role === 'Organizer' ? styles.organizerBadge : styles.userBadge}>
+                    {user.role}
+                  </span>
+                </td>
+                <td style={styles.tableCell}>
+                  {new Date(user.createdAt).toLocaleDateString('fr-FR')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <p>Aucun utilisateur trouvé.</p>
+    )}
+  </div>
+)}
+      
     </div>
   );
 };
 
 const styles = {
+  tableContainer: {
+  overflowX: 'auto',
+  borderRadius: '8px',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+},
+usersTable: {
+  width: '100%',
+  borderCollapse: 'collapse',
+  backgroundColor: 'white',
+},
+tableHeader: {
+  backgroundColor: '#4f46e5',
+  color: 'white',
+  padding: '12px',
+  textAlign: 'left',
+  fontWeight: '600',
+},
+tableCell: {
+  padding: '12px',
+  borderBottom: '1px solid #e5e7eb',
+},
+adminBadge: {
+  backgroundColor: '#dc2626',
+  color: 'white',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  fontSize: '0.8rem',
+},
+organizerBadge: {
+  backgroundColor: '#2563eb',
+  color: 'white',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  fontSize: '0.8rem',
+},
+userBadge: {
+  backgroundColor: '#16a34a',
+  color: 'white',
+  padding: '4px 8px',
+  borderRadius: '4px',
+  fontSize: '0.8rem',
+},
+
   container: {
     padding: '2rem',
     maxWidth: '1200px',

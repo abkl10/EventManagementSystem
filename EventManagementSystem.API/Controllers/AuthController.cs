@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace EventManagementSystem.API.Controllers
@@ -50,7 +51,7 @@ namespace EventManagementSystem.API.Controllers
                 return BadRequest(result.Errors);
             }
 
-            
+
 
             return Ok("Registration successful");
         }
@@ -72,10 +73,10 @@ namespace EventManagementSystem.API.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("role", roles.FirstOrDefault() ?? "User") 
+                new Claim("role", roles.FirstOrDefault() ?? "User")
             };
 
-            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role))); 
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
@@ -92,7 +93,7 @@ namespace EventManagementSystem.API.Controllers
 
             return Ok(new { token = tokenString, email = user.Email, role = roles.FirstOrDefault() ?? "User" });
         }
-        
+
         [HttpPost("assign-role")]
         public async Task<IActionResult> AssignRole(string email, string role)
         {
@@ -105,6 +106,47 @@ namespace EventManagementSystem.API.Controllers
 
             return Ok($"Rôle {role} assigné à {email}");
         }
+
+        [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var users = _userManager.Users.ToList();
+                var userDtos = new List<UserDto>();
+
+                foreach (var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    userDtos.Add(new UserDto
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        FullName = user.FullName,
+                        Role = roles.FirstOrDefault() ?? "User",
+                        CreatedAt = user.CreatedAt
+                    });
+                }
+
+                return Ok(userDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Erreur serveur lors de la récupération des utilisateurs", error = ex.Message });
+            }
+        }
+
+        public class UserDto
+        {
+            public string Id { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string FullName { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
+            public DateTime CreatedAt { get; set; }
+        }
+            
 
     }
 }
