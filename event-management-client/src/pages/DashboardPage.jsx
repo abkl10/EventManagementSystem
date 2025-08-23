@@ -262,7 +262,7 @@ const DashboardPage = () => {
                 </p>
                 <p style={styles.eventDescription}>{event.description}</p>
                 <button 
-                  onClick={() => navigate(`/events/${event.id}`)}
+                  onClick={() => navigate(`/events/`)}
                   style={styles.viewButton}
                 >
                   Voir détails
@@ -346,6 +346,28 @@ const DashboardPage = () => {
 };
 
 const styles = {
+  roleSelect: {
+  padding: '4px 8px',
+  borderRadius: '4px',
+  border: '1px solid #d1d5db',
+},
+editButton: {
+  backgroundColor: '#3b82f6',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  padding: '6px 12px',
+  cursor: 'pointer',
+},
+cancelButton: {
+  backgroundColor: '#6b7280',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  padding: '6px 12px',
+  cursor: 'pointer',
+},
+
   tableContainer: {
   overflowX: 'auto',
   borderRadius: '8px',
