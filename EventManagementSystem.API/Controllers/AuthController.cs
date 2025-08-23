@@ -35,7 +35,8 @@ namespace EventManagementSystem.API.Controllers
             {
                 UserName = dto.Email,
                 Email = dto.Email,
-                FullName = dto.FullName
+                FullName = dto.FullName,
+                CreatedAt = DateTime.UtcNow
             };
 
 
