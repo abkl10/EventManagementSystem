@@ -81,13 +81,14 @@ const ReservationPage = () => {
         <h1 style={styles.title}>
           {role === 'Admin' ? '📋 Toutes les Réservations' : '📋 Mes Réservations'}
         </h1>
-        
+        {token && (
         <button 
           onClick={() => navigate('/reservations/new')} 
           style={styles.createButton}
         >
           ➕ Nouvelle Réservation
         </button>
+        )}
       </div>
 
       {reservations.length === 0 ? (
