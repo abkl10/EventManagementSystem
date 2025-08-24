@@ -13,6 +13,13 @@ const DashboardPage = () => {
     upcomingEvents: 0,
     recentReservations: 0
   });
+  
+  const [recentEvents, setRecentEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false); 
+  const [editingUser, setEditingUser] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
 
   const fetchUsers = async () => {
   if (role !== 'Admin') return;
@@ -30,13 +37,6 @@ const DashboardPage = () => {
   }
 };
 
-  
-  const [recentEvents, setRecentEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [users, setUsers] = useState([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false); 
-  const [editingUser, setEditingUser] = useState(null);
-  const [availableRoles, setAvailableRoles] = useState([]);
 
   const fetchAvailableRoles = async () => {
     try {
@@ -291,7 +291,7 @@ const DashboardPage = () => {
           <tbody>
             {users.map(user => (
               <tr key={user.id}>
-                <td style={styles.tableCell}>{user.email}</td>
+                <td style={styles.tableCell}>{user.email}{user.email == userEmail && ( <span style={styles.Badge}>You</span>)}</td>
                 <td style={styles.tableCell}>
                   {editingUser === user.id ? (
                     <select 
@@ -346,6 +346,15 @@ const DashboardPage = () => {
 };
 
 const styles = {
+  Badge: {
+  backgroundColor: '#4f46e5',
+  color: 'white',
+  padding: '2px 8px',
+  borderRadius: '12px',
+  fontSize: '0.75rem',
+  fontWeight: '600',
+  marginLeft: '8px', 
+},
   roleSelect: {
   padding: '4px 8px',
   borderRadius: '4px',
