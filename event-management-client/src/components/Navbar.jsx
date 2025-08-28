@@ -21,12 +21,15 @@ const Navbar = () => {
     <nav style={styles.nav}>
       <h2 style={styles.logo}>🎟️ Event Manager</h2>
       <ul style={styles.links}>
+        {isAuthenticated ? (
+          <>
+        <li><Link to="/dashboard" style={styles.link}>Dashboard</Link></li>
+        </>):(<></>)}
         <li><Link to="/events" style={styles.link}>Events</Link></li>
         <li><Link to="/reservations" style={styles.link}>Reservations</Link></li>
 
         {isAuthenticated ? (
           <>
-            <li><Link to="/dashboard" style={styles.link}>Dashboard</Link></li>
             <li><button onClick={handleLogout} style={{ ...styles.link, background: 'none', border: 'none', cursor: 'pointer' }}>Logout</button></li>
           </>
         ) : (
