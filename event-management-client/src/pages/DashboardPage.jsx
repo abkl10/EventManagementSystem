@@ -204,7 +204,7 @@ const DashboardPage = () => {
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>Actions Rapides</h2>
         <div style={styles.actionsGrid}>
-          {(role === 'Organizer' || role === 'Admin') && (
+          {(role === 'Organizer') && (
             <button 
               onClick={() => navigate('/events/new')} 
               style={styles.actionButton}
