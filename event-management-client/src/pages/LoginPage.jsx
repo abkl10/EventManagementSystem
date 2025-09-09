@@ -1,42 +1,64 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
-  const [token, setToken] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(''); 
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
     
     try {
       const res = await axios.post('http://localhost:5161/api/auth/login', form);
 
       if (res.data.token) {
-        setToken(res.data.token);
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userEmail', res.data.email);
         localStorage.setItem('role', res.data.role);
 
-        setError('');
-        navigate('/dashboard'); 
+        toast.success('Connexion réussie! Redirection...', {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        
+        // Navigate after showing the success message
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
       } else {
-        setError('Invalid login response');
+        toast.error('Réponse de connexion invalide', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      toast.error(err.response?.data?.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -44,6 +66,7 @@ const LoginPage = () => {
 
   return (
     <div style={styles.container}>
+      <ToastContainer />
       <div style={styles.loginCard}>
         <div style={styles.logoSection}>
           <div style={styles.logo}>
@@ -94,20 +117,6 @@ const LoginPage = () => {
             )}
           </button>
         </form>
-        
-        {token && (
-          <div style={styles.successMessage}>
-            <i className="fas fa-check-circle" style={styles.successIcon}></i>
-            <span>Connexion réussie! Redirection...</span>
-          </div>
-        )}
-        
-        {error && (
-          <div style={styles.errorMessage}>
-            <i className="fas fa-exclamation-circle" style={styles.errorIcon}></i>
-            <span>{error}</span>
-          </div>
-        )}
         
         <div style={styles.footer}>
           <p style={styles.footerText}>
